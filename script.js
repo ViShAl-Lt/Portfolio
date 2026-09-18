@@ -1,58 +1,53 @@
 /* ============================================================
-   VISHAL.DEV — Portfolio Scripts
+   Portfolio Client Scripts — Vishal Gangwar
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ==========================================
-    // 1. TYPEWRITER EFFECT (Matched to Resume Roles)
-    // ==========================================
-    const typewriterEl = document.getElementById('typewriterText');
-    const words = [
+    // 1. Role Typing Animation
+    const typedWordEl = document.getElementById('typedWord');
+    const roles = [
         'Frontend Developer',
         'Web Designer',
         'UI/UX Designer',
         'React.js Developer',
         'MERN Stack Specialist'
     ];
-    let wordIndex = 0;
-    let charIndex = 0;
+    let roleIdx = 0;
+    let charIdx = 0;
     let isDeleting = false;
-    let typeSpeed = 100;
+    let typeDelay = 100;
 
-    function typeWriter() {
-        const currentWord = words[wordIndex];
+    function handleTyping() {
+        const currentRole = roles[roleIdx];
 
         if (isDeleting) {
-            typewriterEl.textContent = currentWord.substring(0, charIndex - 1);
-            charIndex--;
-            typeSpeed = 45;
+            typedWordEl.textContent = currentRole.substring(0, charIdx - 1);
+            charIdx--;
+            typeDelay = 45;
         } else {
-            typewriterEl.textContent = currentWord.substring(0, charIndex + 1);
-            charIndex++;
-            typeSpeed = 90;
+            typedWordEl.textContent = currentRole.substring(0, charIdx + 1);
+            charIdx++;
+            typeDelay = 90;
         }
 
-        if (!isDeleting && charIndex === currentWord.length) {
-            typeSpeed = 2200; // pause at word completion
+        if (!isDeleting && charIdx === currentRole.length) {
+            typeDelay = 2200;
             isDeleting = true;
-        } else if (isDeleting && charIndex === 0) {
+        } else if (isDeleting && charIdx === 0) {
             isDeleting = false;
-            wordIndex = (wordIndex + 1) % words.length;
-            typeSpeed = 400; // pause before next word
+            roleIdx = (roleIdx + 1) % roles.length;
+            typeDelay = 400;
         }
 
-        setTimeout(typeWriter, typeSpeed);
+        setTimeout(handleTyping, typeDelay);
     }
 
-    // Start typewriter after a slight delay
-    setTimeout(typeWriter, 1200);
+    setTimeout(handleTyping, 1200);
 
 
-    // ==========================================
-    // 2. SCROLL REVEAL (IntersectionObserver)
-    // ==========================================
-    const revealElements = document.querySelectorAll('.reveal');
+    // 2. Scroll Reveal Animations
+    const animElements = document.querySelectorAll('.anim-reveal');
 
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -66,55 +61,50 @@ document.addEventListener('DOMContentLoaded', () => {
         rootMargin: '0px 0px -40px 0px'
     });
 
-    revealElements.forEach((el) => {
+    animElements.forEach((el) => {
         revealObserver.observe(el);
     });
 
 
-    // ==========================================
-    // 3. SKILL BARS ANIMATION
-    // ==========================================
-    const skillObserver = new IntersectionObserver((entries) => {
+    // 3. Skill Progress Fill Animation
+    const meterObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
-                const fills = entry.target.querySelectorAll('.skill-fill');
-                fills.forEach((fill, index) => {
-                    const width = fill.getAttribute('data-width');
+                const bars = entry.target.querySelectorAll('.meter-bar');
+                bars.forEach((bar, i) => {
+                    const width = bar.getAttribute('data-width');
                     setTimeout(() => {
-                        fill.style.width = width + '%';
-                        fill.classList.add('animated');
-                    }, index * 120);
+                        bar.style.width = width + '%';
+                    }, i * 120);
                 });
-                skillObserver.unobserve(entry.target);
+                meterObserver.unobserve(entry.target);
             }
         });
     }, {
         threshold: 0.2
     });
 
-    document.querySelectorAll('.skills-grid').forEach(grid => {
-        skillObserver.observe(grid);
+    document.querySelectorAll('.skill-groups').forEach(group => {
+        meterObserver.observe(group);
     });
 
 
-    // ==========================================
-    // 4. ACTIVE NAV LINK ON SCROLL
-    // ==========================================
+    // 4. Header Active Link on Scroll
     const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const navLinks = document.querySelectorAll('.nav-menu a');
 
-    function updateActiveNav() {
+    function syncNavState() {
         const scrollPos = window.scrollY + 120;
 
-        sections.forEach((section) => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
+        sections.forEach((sec) => {
+            const secTop = sec.offsetTop;
+            const secHeight = sec.offsetHeight;
+            const secId = sec.getAttribute('id');
 
-            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+            if (scrollPos >= secTop && scrollPos < secTop + secHeight) {
                 navLinks.forEach((link) => {
                     link.classList.remove('active');
-                    if (link.getAttribute('href') === '#' + sectionId) {
+                    if (link.getAttribute('href') === '#' + secId) {
                         link.classList.add('active');
                     }
                 });
@@ -122,59 +112,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.addEventListener('scroll', updateActiveNav, { passive: true });
-    updateActiveNav();
+    window.addEventListener('scroll', syncNavState, { passive: true });
+    syncNavState();
 
 
-    // ==========================================
-    // 5. MOBILE HAMBURGER MENU
-    // ==========================================
-    const hamburger = document.getElementById('hamburger');
-    const navLinksEl = document.getElementById('navLinks');
+    // 5. Mobile Menu Toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const navMenu = document.getElementById('navMenu');
 
-    if (hamburger && navLinksEl) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinksEl.classList.toggle('open');
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            navMenu.classList.toggle('open');
         });
 
-        navLinksEl.querySelectorAll('a').forEach((link) => {
+        navMenu.querySelectorAll('a').forEach((link) => {
             link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                navLinksEl.classList.remove('open');
+                menuBtn.classList.remove('active');
+                navMenu.classList.remove('open');
             });
         });
     }
 
 
-    // ==========================================
-    // 6. NAVBAR HIDE/SHOW ON SCROLL
-    // ==========================================
-    let lastScrollY = 0;
-    const navbar = document.getElementById('navbar');
-    const gradientLine = document.querySelector('.gradient-line');
+    // 6. Header Show / Hide on Scroll
+    let previousScroll = 0;
+    const siteHeader = document.getElementById('siteHeader');
+    const accentBar = document.querySelector('.accent-bar');
 
     window.addEventListener('scroll', () => {
-        const currentScrollY = window.scrollY;
+        const currentScroll = window.scrollY;
 
-        if (currentScrollY > lastScrollY && currentScrollY > 200) {
-            navbar.style.transform = 'translateY(-100%)';
-            gradientLine.style.transform = 'translateY(-100%)';
+        if (currentScroll > previousScroll && currentScroll > 200) {
+            siteHeader.style.transform = 'translateY(-100%)';
+            accentBar.style.transform = 'translateY(-100%)';
         } else {
-            navbar.style.transform = 'translateY(0)';
-            gradientLine.style.transform = 'translateY(0)';
+            siteHeader.style.transform = 'translateY(0)';
+            accentBar.style.transform = 'translateY(0)';
         }
 
-        navbar.style.transition = 'transform 0.3s ease';
-        gradientLine.style.transition = 'transform 0.3s ease';
+        siteHeader.style.transition = 'transform 0.3s ease';
+        accentBar.style.transition = 'transform 0.3s ease';
 
-        lastScrollY = currentScrollY;
+        previousScroll = currentScroll;
     }, { passive: true });
 
 
-    // ==========================================
-    // 7. SMOOTH SCROLL FOR NAV LINKS
-    // ==========================================
+    // 7. Smooth Scroll for Page Anchors
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
@@ -192,26 +176,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // ==========================================
-    // 8. COUNTER ANIMATION FOR STATS
-    // ==========================================
-    function animateCounters() {
-        const statNumbers = document.querySelectorAll('.stat-number');
+    // 8. Stats Counting Effect
+    function countUpStats() {
+        const metricNums = document.querySelectorAll('.metric-num');
         
-        statNumbers.forEach(stat => {
-            const text = stat.textContent;
+        metricNums.forEach(el => {
+            const text = el.textContent;
             if (text.includes('+')) {
-                const num = parseInt(text, 10);
-                if (!isNaN(num)) {
-                    let current = 0;
-                    const increment = Math.max(1, num / 20);
+                const target = parseInt(text, 10);
+                if (!isNaN(target)) {
+                    let count = 0;
+                    const step = Math.max(1, target / 20);
                     const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= num) {
-                            stat.textContent = num + '+';
+                        count += step;
+                        if (count >= target) {
+                            el.textContent = target + '+';
                             clearInterval(timer);
                         } else {
-                            stat.textContent = Math.floor(current) + '+';
+                            el.textContent = Math.floor(count) + '+';
                         }
                     }, 40);
                 }
@@ -219,58 +201,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const heroSection = document.getElementById('hero');
-    if (heroSection) {
+    const heroBlock = document.getElementById('hero');
+    if (heroBlock) {
         const heroObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    setTimeout(animateCounters, 700);
+                    setTimeout(countUpStats, 700);
                     heroObserver.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.2 });
 
-        heroObserver.observe(heroSection);
+        heroObserver.observe(heroBlock);
     }
 
 
-    // ==========================================
-    // 9. INTERACTIVE CURSOR GLOW FOLLOW EFFECT
-    // ==========================================
-    const cursorGlow = document.getElementById('cursorGlow');
+    // 9. Ambient Mouse Follow Glow
+    const mouseGlow = document.getElementById('mouseGlow');
 
-    if (cursorGlow) {
+    if (mouseGlow) {
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
         let glowX = mouseX;
         let glowY = mouseY;
-        let isCursorVisible = false;
+        let glowVisible = false;
 
         window.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
 
-            if (!isCursorVisible) {
-                cursorGlow.style.opacity = '1';
-                isCursorVisible = true;
+            if (!glowVisible) {
+                mouseGlow.style.opacity = '1';
+                glowVisible = true;
             }
         });
 
         window.addEventListener('mouseleave', () => {
-            cursorGlow.style.opacity = '0';
-            isCursorVisible = false;
+            mouseGlow.style.opacity = '0';
+            glowVisible = false;
         });
 
-        // Smooth physics-based trailing loop using lerp (Linear Interpolation)
-        function animateCursor() {
+        function trackGlow() {
             glowX += (mouseX - glowX) * 0.12;
             glowY += (mouseY - glowY) * 0.12;
-            cursorGlow.style.left = `${glowX}px`;
-            cursorGlow.style.top = `${glowY}px`;
+            mouseGlow.style.left = `${glowX}px`;
+            mouseGlow.style.top = `${glowY}px`;
 
-            requestAnimationFrame(animateCursor);
+            requestAnimationFrame(trackGlow);
         }
-        requestAnimationFrame(animateCursor);
+        requestAnimationFrame(trackGlow);
     }
 
 });
